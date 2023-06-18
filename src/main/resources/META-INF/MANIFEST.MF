@@ -1,0 +1,1 @@
+Dependencies: io.smallrye.graphql.client.vertx services
