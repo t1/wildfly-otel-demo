@@ -1,5 +1,7 @@
 package com.example.wildflyoteldemo;
 
+import io.opentelemetry.api.common.AttributeKey;
+import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.Span;
 import io.smallrye.graphql.client.typesafe.api.GraphQLClientApi;
 import jakarta.inject.Inject;
@@ -37,9 +39,21 @@ public class HelloResource {
     @Path("/hello")
     @Produces("text/plain")
     public String hello() {
-        Span.current().getSpanContext().getTraceId();
         log.info("### got REST hello in trace {}", Span.current().getSpanContext().getTraceId());
-        return graphql.hello() + ", " + rest.target() + "!";
+        // io.opentelemetry.api.logs.Logger customAppenderLogger =
+        //     GlobalOpenTelemetry.get().getLogsBridge().get("custom-log-appender");
+        // customAppenderLogger
+        //     .logRecordBuilder()
+        //     .setSeverity(Severity.INFO)
+        //     .setBody("A log message from a custom appender without a span")
+        //     .setAttribute(AttributeKey.stringKey("key"), "value")
+        //     .emit();
+        var greeting = graphql.hello();
+        var greetee = rest.target();
+        Span.current().addEvent("greet", Attributes.of(
+            AttributeKey.stringKey("greeting"), greeting,
+            AttributeKey.stringKey("greetee"), greetee));
+        return greeting + ", " + greetee + "!";
     }
 
     @GET
