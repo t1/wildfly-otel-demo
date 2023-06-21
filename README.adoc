@@ -1,0 +1,22 @@
+= WildFly OpenTelemetry Demo
+
+Quick demo on how to use OpenTelemetry in a WildFly.
+
+It has three API elements:
+
+1. a GraphQL query `hello` returning "Hello",
+2. a REST resource `/rest/target` returning "World", and
+3. a REST resource `/rest/hello` combining the other two.
+
+'''
+
+Start it with:
+
+[source,bash]
+----
+docker run --name jaeger --rm -e COLLECTOR_OTLP_ENABLED=true -p 16686:16686 -p 14250:14250 -p 4317:4317 -p 4318:4318 jaegertracing/all-in-one
+
+mvn clean wildfly:provision wildfly:dev
+----
+
+Then open http://localhost:16686 to see traces in the Jaeger GUI.
